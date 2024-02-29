@@ -18,6 +18,10 @@ Have a well defined api for server side teeworlds bots:
 - It should not depend on state.
 - It should be hot reloadable.
 
+Sample of a current implementation of a bot that should be outdated by this new api.
+
+https://github.com/DDNetPP/DDNetPP/blob/72aa916964f4c1714463314ea9b6b5e894fda807/src/game/server/entities/dummy/blmapchill_police.cpp
+
 ## implementation details user facing api
 
 The general idea is that the whole api consists of one function call.
