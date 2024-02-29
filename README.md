@@ -30,7 +30,7 @@ And one output buffer for the current bot state given the world state. Consider 
 
 void CCharacter::OnTick()
 {
-  CServerBotState State;
+  ServerBotState State;
   server_bots(this, &State);
 
   m_Direction = State.m_Direction;
@@ -87,3 +87,65 @@ Which in the end compiles to the old code in release mode and the comments will 
 But in debug mode those comments should either be printed or added as a list to the output struct for inspection.
 
 This ensures that you can always obtain the "why" for the current state. And also see which movement values got overwritten.
+
+## draft of the required input
+
+Ideally something that is easy to pass from a teeworlds code base.
+Such as a pointer to a CCharacter or ICollision.
+But it should also not require the bot library to link against an entire teeworlds code base.
+
+Maybe a macro can be used to translate a CCharacter pointer into a struct defined in the library.
+The macro could be called like this by the user:
+
+```C++
+void CCharacter::OnTick()
+{
+  // prep state
+  ServerBotCharacter Char;
+  FILL_STATE_CHARACTER(this, Char);
+
+  // pass state to api
+  ServerBotState State;
+  server_bots(this, &State, &Char);
+}
+```
+
+And the FILL_STATE_CHARACTER expands to something like this
+```C++
+  Char.m_Vel = m_Vel;
+  Char.m_Weapon = m_Weapon;
+  Char.m_Health = m_Health;
+  // ..
+```
+
+And ServerBotCharacter could be defined as a struct in the library like so
+```C++
+struct ServerBotCharacter {
+  int m_Vel;
+  int m_Weapon;
+  int m_Health;
+  // ..
+}
+```
+
+The draw back of not passing a CCharacter pointer directly but using that struct is that it requires much more byte copying. So it becomes a way bigger performance overhead than just passing a pointer to existing memory.
+
+The bot has to know the following things (basically everything gameplay relevant).
+All players in the current world and their state (position, velocity, weapons).
+All projectiles in the world and their state.
+The current map:
+- map name as string
+- map version as int if assumptions are made based on map name
+- the actual map data of all gameplay relevant layers: game, front, tune, speedup, switch
+
+## draft of the output struct
+
+```C++
+struct ServerBotState {
+  // all controls walk/hook/jump/fire/emote/weapon...
+
+  // either a capped array or vector for the debug statements (one per each control)
+  // if it is an array then the control setting macros need to be a ring buffer
+  // ensuring that it always contains the latest x sets
+}
+```
