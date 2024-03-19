@@ -11,7 +11,8 @@ The project might be renamed (I do not like the current name "server-bots" it is
 Have a well defined api for server side teeworlds bots:
 - It should be easy to setup (less than 10 lines of code in mostly one place).
 - It should be highly portable and work in basically any teeworlds or ddnet code base.
-- It should be highly debuggable.
+- It should be highly debuggable via logging.
+- It should be highly debuggable via visual feedback (api for drawing text and lines at coordinates)
 - It should be stable. As in versioned and old bots should still work in 10 years.
 - It should be blazingly fast in production.
 - It should be coverable by 100% unit tests.
@@ -21,6 +22,11 @@ Have a well defined api for server side teeworlds bots:
 Sample of a current implementation of a bot that should be outdated by this new api.
 
 https://github.com/DDNetPP/DDNetPP/blob/72aa916964f4c1714463314ea9b6b5e894fda807/src/game/server/entities/dummy/blmapchill_police.cpp
+
+## terms
+
+There are two parties here. The implementations of both sides of the api call.
+Each have different responsibilities. Those two parties should have catchy and clear names.
 
 ## implementation details user facing api
 
@@ -52,7 +58,7 @@ There is no IO or any other side effects happening in the api.
 These limitations make developing bots a bit more tricky. But it allows to fullfill all the goals.
 It allows for better portability. It allows for clean unit test setups. And it allows to hot reload without breaking state.
 
-## implementation details debuggability
+## implementation details debuggability via logging
 
 While writing such bot it can happen that for example m_Direction is set in one if statement.
 And then overwritten by another one. In the end there is only ever one value that is the output of the current tick.
@@ -91,6 +97,16 @@ Which in the end compiles to the old code in release mode and the comments will 
 But in debug mode those comments should either be printed or added as a list to the output struct for inspection.
 
 This ensures that you can always obtain the "why" for the current state. And also see which movement values got overwritten.
+
+## implementation details debuggability via visual feedback (api for drawing text and lines at coordinates)
+
+An implementation of a server bot should be able to give visual feedback in addition to logging for debugging.
+There should be a well defined api similiar to the logging one that allows for the server bot code to draw lines.
+And render text at certain locations. Or render colored simple shapes such as recentangles.
+It is then up to the implementation consuming the server bot to actually do the drawing.
+This requires writing some code but it is a optional feature if not implemented the bot will still work the same so that is fine.
+There could be a sample implementation that does line drawing via lasers and text via broadcast or loltext.
+And colored rectangles with different types of pickups or colored lasers from ddnet.
 
 ## draft of the required input
 
