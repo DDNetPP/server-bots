@@ -19,6 +19,10 @@ Have a well defined api for server side teeworlds bots:
 - It should not depend on state.
 - It should be hot reloadable.
 
+The whole thing would be pure, without side effects. There is no networking. There is no IO.
+There is no context needed of what happend before or after. It is basically turn based teeworlds.
+Given the current inputs/velocity/world what is the best move for this tick.
+
 Sample of a current implementation of a bot that should be outdated by this new api.
 
 https://github.com/DDNetPP/DDNetPP/blob/72aa916964f4c1714463314ea9b6b5e894fda807/src/game/server/entities/dummy/blmapchill_police.cpp
